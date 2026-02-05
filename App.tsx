@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Header from './components/Header';
-import SecondaryHeader from './components/SecondaryHeader';
+import SecondaryHeader from './components/SecondaryHeader'; // Acts as Sidebar
 import LicenseManagement from './components/LicenseManagement';
 import ContractManagement from './components/ContractManagement';
 import SpecialAgenciesManagement from './components/OtherTopics';
@@ -21,8 +21,6 @@ import TrademarkManagement from './components/TrademarkManagement';
 import Dashboard from './components/Dashboard';
 import CalendarView from './components/CalendarView';
 import { SaveIcon, CheckIcon } from './components/icons/ActionIcons';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import AuthPage from './components/AuthPage';
 
 const getOverallStatus = (statuses: (RecordStatus | undefined)[]): RecordStatus => {
     const validStatuses = statuses.filter(Boolean) as RecordStatus[];
@@ -70,8 +68,7 @@ const getCalculatedStatus = (expiryDate: string | undefined): RecordStatus => {
 
 const STORAGE_KEY = 'SAHER_APP_DATA_V1';
 
-const AppContent: React.FC = () => {
-  const { currentUser } = useAuth();
+const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(TABS[0]);
   
   // Data States
@@ -104,8 +101,6 @@ const AppContent: React.FC = () => {
 
   // Initial Data Loading Effect (Load from LocalStorage or Fallback to Mocks)
   useEffect(() => {
-    if (!currentUser) return;
-
     const processLicenses = (licenses: License[]): License[] => 
         licenses.map(l => ({ ...l, status: getCalculatedStatus(l.expiryDate) }));
         
@@ -162,12 +157,10 @@ const AppContent: React.FC = () => {
     };
 
     loadData();
-  }, [currentUser]);
+  }, []);
 
   // AUTO SAVE EFFECT
   useEffect(() => {
-    if (!currentUser) return;
-
     const dataToSave = {
         commercialLicenses,
         operationalLicenses,
@@ -209,8 +202,7 @@ const AppContent: React.FC = () => {
       procedures,
       otherTopicsData,
       trademarkCerts,
-      archivedRecords,
-      currentUser
+      archivedRecords
   ]);
 
   // Global Save Handler
@@ -305,8 +297,6 @@ const AppContent: React.FC = () => {
 
   // Notification Logic
   useEffect(() => {
-    if (!currentUser) return;
-
     const allRecords = [
         ...commercialLicenses,
         ...operationalLicenses,
@@ -365,8 +355,7 @@ const AppContent: React.FC = () => {
       leaseContracts, 
       generalContracts, 
       otherTopicsData, 
-      trademarkCerts,
-      currentUser
+      trademarkCerts
   ]);
 
 
@@ -772,61 +761,68 @@ const AppContent: React.FC = () => {
     }
   };
 
-  if (!currentUser) {
-      return <AuthPage />;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col">
-      <Header 
-        searchQuery={searchQuery}
-        onSearchChange={(e) => setSearchQuery(e.target.value)}
-        onBackup={handleBackup}
-        onRestore={handleRestoreBackup}
-      />
+    <div className="flex h-screen bg-slate-50 text-gray-800 overflow-hidden font-sans">
       
+      {/* Sidebar (Formerly SecondaryHeader) */}
       <SecondaryHeader 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
         counts={tabCounts} 
       />
 
-      {showNotification && expiringItems.length > 0 && (
-          <NotificationBanner 
-              items={expiringItems}
-              onSendEmail={handleSendNotificationEmail}
-              onDismiss={handleDismissNotification}
-          />
-      )}
-
-      {/* Save Action Bar - Centered */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-6 flex justify-center items-center relative z-10">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
           
-          {/* Save Button - Colored matched to Send Report Button (#eab308 bg, #091526 text) */}
-          <button
-              onClick={handleGlobalSave}
-              className="bg-[#eab308] hover:bg-[#ca9a07] text-[#091526] px-8 py-3 rounded-xl transition-all shadow-lg shadow-yellow-900/20 hover:shadow-yellow-900/40 flex items-center gap-3 font-bold text-base transform hover:-translate-y-0.5"
-              aria-label="حفظ التغييرات"
-              title="حفظ التغييرات"
-          >
-             <SaveIcon />
-             <span>حفظ التغييرات</span>
-          </button>
+          {/* Top Header */}
+          <Header 
+            searchQuery={searchQuery}
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            onBackup={handleBackup}
+            onRestore={handleRestoreBackup}
+          />
+          
+          <main className="flex-1 overflow-y-auto bg-slate-50 relative custom-scrollbar">
+            <div className="max-w-7xl mx-auto p-6 md:p-8">
+                
+                {showNotification && expiringItems.length > 0 && (
+                    <NotificationBanner 
+                        items={expiringItems}
+                        onSendEmail={handleSendNotificationEmail}
+                        onDismiss={handleDismissNotification}
+                    />
+                )}
 
-          {/* Success Message - Absolute Positioned Below */}
-          <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-3 transition-all duration-500 ease-in-out ${saveSuccess ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} flex items-center gap-2 text-green-700 bg-green-50 px-4 py-2 rounded-lg border border-green-200 shadow-sm whitespace-nowrap z-20`}>
-               <CheckIcon />
-               <span className="font-bold text-sm">تم حفظ التعديلات بنجاح</span>
-          </div>
+                 {/* Tab Title (Breadcrumb style) */}
+                 <div className="mb-6 flex items-center gap-2 text-sm text-slate-500">
+                    <span>الرئيسية</span>
+                    <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <span className="font-bold text-slate-800">{activeTab.name}</span>
+                 </div>
+
+                {renderContent()}
+
+                {/* Floating Save Button */}
+                <div className="fixed bottom-8 left-8 z-50">
+                    <button
+                        onClick={handleGlobalSave}
+                        className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl shadow-blue-600/30 transition-all hover:scale-110 flex items-center justify-center group"
+                        aria-label="حفظ التغييرات"
+                        title="حفظ التغييرات"
+                    >
+                        <SaveIcon />
+                        {saveSuccess && (
+                            <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap animate-fade-in-up">
+                                تم الحفظ!
+                            </span>
+                        )}
+                    </button>
+                </div>
+            </div>
+             <Footer />
+          </main>
       </div>
 
-      <main className="flex-grow p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            {renderContent()}
-          </div>
-        </div>
-      </main>
       <Modal isOpen={modalInfo.isOpen} onClose={handleCloseModal} title={modalInfo.record ? "تعديل السجل" : "إضافة سجل جديد"}>
         {modalInfo.isOpen && (
             <RecordForm
@@ -845,51 +841,60 @@ const AppContent: React.FC = () => {
         size="sm"
       >
         <div className="text-center p-6">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-            <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-6">
+            <svg className="h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mt-5">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
               {deleteConfirmation.isPermanent ? "هل أنت متأكد من الحذف النهائي؟" : "نقل إلى الأرشيف"}
           </h3>
-          <div className="mt-2">
-            <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 mb-8">
               {deleteConfirmation.isPermanent 
-                ? "سيتم حذف هذا السجل بشكل دائم ولا يمكن استعادته مرة أخرى."
-                : "سيتم نقل السجل إلى الأرشيف (سلة المحذوفات). يمكنك استعادته لاحقاً."
+                ? "سيتم حذف هذا السجل بشكل دائم ولا يمكن استعادته مرة أخرى. هذا الإجراء لا يمكن التراجع عنه."
+                : "سيتم نقل السجل إلى الأرشيف. يمكنك استعادته لاحقاً في أي وقت."
               }
-            </p>
-          </div>
-          <div className="flex justify-center gap-4 mt-6">
+          </p>
+          <div className="flex justify-center gap-3">
             <button
               type="button"
               onClick={() => setDeleteConfirmation({ isOpen: false })}
-              className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
             >
               إلغاء الأمر
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 shadow-md shadow-red-500/20 transition-all"
             >
               {deleteConfirmation.isPermanent ? "حذف نهائي" : "نقل للأرشيف"}
             </button>
           </div>
         </div>
       </Modal>
-      <Footer />
+      
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate(-50%, 10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+      `}</style>
     </div>
   );
-};
-
-const App: React.FC = () => {
-    return (
-        <AuthProvider>
-            <AppContent />
-        </AuthProvider>
-    );
 };
 
 export default App;

@@ -1,27 +1,6 @@
 
 import React, { useRef } from 'react';
 import { SearchIcon, PrintIcon, BackupIcon, RestoreIcon } from './icons/ActionIcons';
-import { useAuth } from '../contexts/AuthContext';
-
-const SaherLogo: React.FC = () => (
-  <div className="flex items-center gap-3 sm:gap-4 scale-90 sm:scale-100 origin-right transition-transform">
-    {/* Square Icon Container */}
-    <div className="relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-blue-700 border border-blue-600 shadow-lg overflow-hidden group flex-shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        <span className="text-4xl sm:text-5xl font-bold text-white relative z-10 font-sans">S</span>
-        <span className="absolute top-4 right-4 flex h-3 w-3 z-20">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#eab308] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-[#eab308]"></span>
-        </span>
-    </div>
-
-    {/* Text Branding */}
-    <div className="flex flex-col items-start">
-      <span className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-none">SAHER</span>
-      <span className="text-[10px] sm:text-xs font-bold text-[#eab308] tracking-widest uppercase mt-1">FOR SMART SERVICES</span>
-    </div>
-  </div>
-);
 
 interface HeaderProps {
     searchQuery: string;
@@ -32,7 +11,6 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onBackup, onRestore }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { logout } = useAuth();
 
   const handleRestoreClick = () => {
     fileInputRef.current?.click();
@@ -43,64 +21,48 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onBackup, 
     if (file) {
       onRestore(file);
     }
-    // Reset input to allow selecting the same file again if needed
     if (fileInputRef.current) {
         fileInputRef.current.value = '';
     }
   };
 
   return (
-    <header className="bg-[#091526] border-b-4 border-[#eab308] shadow-sm relative z-30 print:hidden">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-auto py-4 sm:py-0 sm:h-28 gap-4">
-          
-          {/* Right Side: Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <SaherLogo />
-          </div>
-
-          {/* Center: Title (Visible on Large Screens) */}
-          <div className="hidden xl:flex flex-col items-center mx-4 text-center">
-            <h1 className="text-sm font-medium text-[#eab308] border border-[#12244d] px-5 py-1 rounded-full bg-[#12244d]/20 mb-1">
-              إدارة الخدمات العامة / قسم إدارة المرافق
-            </h1>
-            <p className="text-xl font-bold text-white mt-1">نظام تسجيل الرخص التجارية والأنشطة والعقود</p>
-          </div>
-
-           {/* Left Side: Search & Actions */}
-           <div className="flex-shrink-0 flex items-center gap-3 sm:gap-4 justify-end">
-             
-             {/* Search Input */}
-             <div className="relative w-32 sm:w-56 md:w-64 print:hidden group">
-                <input
-                    type="text"
-                    placeholder="بحث..."
-                    value={searchQuery}
-                    onChange={onSearchChange}
-                    className="w-full pr-9 pl-3 py-2 sm:pr-10 sm:pl-4 sm:py-2.5 bg-slate-900/50 border border-slate-700 text-white placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#eab308]/50 focus:border-[#eab308] transition-all text-sm"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500 group-focus-within:text-[#eab308] transition-colors">
+    <header className="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shadow-sm relative z-20 print:hidden">
+        
+        {/* Left Side: Search */}
+        <div className="flex items-center gap-4 flex-1">
+            <div className="relative w-full max-w-md group">
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
                     <SearchIcon />
                 </div>
+                <input
+                    type="text"
+                    placeholder="ابحث عن رخصة، عقد، أو رقم..."
+                    value={searchQuery}
+                    onChange={onSearchChange}
+                    className="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all text-sm"
+                />
             </div>
+        </div>
 
-            <div className="flex items-center gap-2">
-                 {/* Backup Button */}
+        {/* Right Side: Actions */}
+        <div className="flex items-center gap-3">
+             <div className="h-6 w-px bg-slate-200 mx-2"></div>
+
+             {/* Action Buttons */}
+             <div className="flex items-center gap-2">
                 <button
                     onClick={onBackup}
-                    className="bg-[#1e293b] p-2.5 rounded-xl hover:bg-[#334155] transition-colors shadow-sm flex items-center justify-center print:hidden border border-gray-700 text-white flex-shrink-0 group relative"
-                    aria-label="نسخ احتياطي"
+                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                     title="نسخ احتياطي للبيانات"
                 >
                     <BackupIcon />
                 </button>
 
-                {/* Restore Button */}
                 <button
                     onClick={handleRestoreClick}
-                    className="bg-[#1e293b] p-2.5 rounded-xl hover:bg-[#334155] transition-colors shadow-sm flex items-center justify-center print:hidden border border-gray-700 text-white flex-shrink-0 group relative"
-                    aria-label="استعادة نسخة"
-                    title="استعادة البيانات من نسخة احتياطية"
+                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                    title="استعادة البيانات"
                 >
                     <RestoreIcon />
                 </button>
@@ -112,32 +74,15 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onBackup, 
                     accept=".json"
                 />
 
-                {/* Print Button */}
                 <button
                     onClick={() => window.print()}
-                    className="bg-[#1e293b] p-2.5 rounded-xl hover:bg-[#334155] transition-colors shadow-sm flex items-center justify-center print:hidden border border-gray-700 text-white flex-shrink-0"
-                    aria-label="طباعة الصفحة"
-                    title="طباعة الصفحة"
+                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                    title="طباعة"
                 >
                     <PrintIcon />
                 </button>
-
-                {/* Logout Button */}
-                <button
-                    onClick={logout}
-                    className="bg-red-900/30 p-2.5 rounded-xl hover:bg-red-900/50 transition-colors shadow-sm flex items-center justify-center print:hidden border border-red-800 text-red-200 flex-shrink-0 ml-2"
-                    aria-label="تسجيل خروج"
-                    title="تسجيل خروج"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                </button>
             </div>
-
-           </div>
         </div>
-      </div>
     </header>
   );
 };

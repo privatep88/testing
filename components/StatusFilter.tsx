@@ -9,26 +9,29 @@ interface StatusFilterProps {
 
 const StatusFilter: React.FC<StatusFilterProps> = ({ value, onChange }) => {
   const options = [
-    { value: 'all', label: 'الكل', activeClass: 'bg-[#334155] text-white border-transparent' },
-    { value: RecordStatus.Active, label: RecordStatus.Active, activeClass: 'bg-green-500 text-white border-transparent' },
-    { value: RecordStatus.SoonToExpire, label: RecordStatus.SoonToExpire, activeClass: 'bg-yellow-500 text-white border-transparent' },
-    { value: RecordStatus.Expired, label: RecordStatus.Expired, activeClass: 'bg-red-500 text-white border-transparent' },
+    { value: 'all', label: 'الكل', activeClass: 'bg-slate-800 text-white shadow-md' },
+    { value: RecordStatus.Active, label: RecordStatus.Active, activeClass: 'bg-emerald-500 text-white shadow-md' },
+    { value: RecordStatus.SoonToExpire, label: RecordStatus.SoonToExpire, activeClass: 'bg-amber-500 text-white shadow-md' },
+    { value: RecordStatus.Expired, label: RecordStatus.Expired, activeClass: 'bg-rose-500 text-white shadow-md' },
   ];
 
-  const baseClass = "px-4 py-1.5 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500";
-  const inactiveClass = "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300";
+  const baseClass = "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border";
+  const inactiveClass = "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300";
 
   return (
-    <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
-      {options.map(opt => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value as RecordStatus | 'all')}
-          className={`${baseClass} ${value === opt.value ? opt.activeClass : inactiveClass}`}
-        >
-          {opt.label}
-        </button>
-      ))}
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-gray-500 ml-2">تصفية حسب الحالة:</span>
+      <div className="flex items-center gap-2">
+        {options.map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value as RecordStatus | 'all')}
+            className={`${baseClass} ${value === opt.value ? `${opt.activeClass} border-transparent` : inactiveClass}`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

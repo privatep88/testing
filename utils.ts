@@ -6,13 +6,13 @@ export const formatCost = (cost: number) => new Intl.NumberFormat('en-US').forma
 export const getStatusClass = (status: RecordStatus) => {
   switch (status) {
     case RecordStatus.Active:
-      return 'bg-green-100 text-green-800 border border-green-200';
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
     case RecordStatus.SoonToExpire:
-      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+      return 'bg-amber-50 text-amber-700 border border-amber-200';
     case RecordStatus.Expired:
-      return 'bg-red-100 text-red-800 border border-red-200';
+      return 'bg-rose-50 text-rose-700 border border-rose-200';
     default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200';
+      return 'bg-slate-50 text-slate-700 border border-slate-200';
   }
 };
 
@@ -68,10 +68,10 @@ export const getRemainingPeriodClass = (expiryDate: string | undefined): string 
     if (diffDays === null) return '';
 
     if (diffDays < 0) {
-        return 'text-red-600 font-bold';
+        return 'text-rose-600 font-bold';
     }
     if (diffDays <= 120) { // 4 months warning
-        return 'text-yellow-600 font-bold';
+        return 'text-amber-600 font-bold';
     }
-    return 'text-green-600 font-medium';
+    return 'text-emerald-600 font-medium';
 };
