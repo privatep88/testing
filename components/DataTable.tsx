@@ -170,19 +170,18 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
   };
   
   return (
-    <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden ${isOpen ? 'mb-8' : 'mb-4'} transition-all duration-300`}>
+    <div className={`bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden ${isOpen ? 'mb-6' : 'mb-3'} transition-all duration-300`}>
       {/* Table Header / Toolbar */}
-      <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white">
+      <div className="px-6 py-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto">
              <div 
                 onClick={() => isCollapsible && setIsOpen(!isOpen)} 
                 className={`flex items-center gap-3 ${isCollapsible ? 'cursor-pointer select-none hover:opacity-80 transition-opacity' : ''}`}
             >
-                {/* Title is passed as a ReactNode, we assume it handles its own styling, but we wrap it for alignment */}
                 <div className="flex items-center gap-2">
                     {title}
                     {isCollapsible && (
-                        <div className={`text-gray-400 p-1 rounded-full hover:bg-gray-100 transition-transform duration-200 transform ${isOpen ? 'rotate-180' : ''}`}>
+                        <div className={`text-slate-400 p-1 rounded-full hover:bg-slate-100 transition-transform duration-200 transform ${isOpen ? 'rotate-180' : ''}`}>
                             <ChevronDownIcon />
                         </div>
                     )}
@@ -190,7 +189,7 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
             </div>
             {/* Filter Component Slot */}
             {filterComponent && (
-                <div className="sm:pr-4 sm:border-r sm:border-slate-200">
+                <div className="sm:pr-4 sm:border-r sm:border-slate-100">
                     {filterComponent}
                 </div>
             )}
@@ -200,7 +199,7 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
         <div className={`flex items-center gap-3 w-full sm:w-auto transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <button
               onClick={handleExport}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-slate-600 bg-white border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all text-sm font-medium shadow-sm"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-slate-600 bg-white border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all text-sm font-medium shadow-sm hover:shadow-md"
             >
               <ExcelSheetIcon />
               <span>تصدير</span>
@@ -208,7 +207,7 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
             {onAdd && (
                 <button
                   onClick={onAdd}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 transition-all text-sm font-bold shadow-md"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all text-sm font-bold hover:-translate-y-0.5"
                 >
                   <PlusIcon />
                   <span>إضافة</span>
@@ -218,14 +217,14 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
       </div>
       
       {isOpen && (
-      <div className="overflow-x-auto animate-fade-in">
-        <table className="min-w-full divide-y divide-slate-100">
+      <div className="overflow-x-auto animate-fade-in custom-scrollbar">
+        <table className="min-w-full divide-y divide-slate-50">
           <thead>
-            <tr className="bg-slate-50">
+            <tr className="bg-slate-50/50">
               {columns.map((col) => {
                  const isSortable = !disableSorting && !['actions', 'attachments', 'serial'].includes(String(col.key));
                  return (
-                    <th key={String(col.key)} className={col.headerClassName || "whitespace-nowrap px-6 py-4 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider"}>
+                    <th key={String(col.key)} className={col.headerClassName || "whitespace-nowrap px-6 py-4 text-center font-bold text-slate-500 text-xs uppercase tracking-wider"}>
                       {isSortable ? (
                          <button onClick={() => requestSort(String(col.key))} className="flex items-center justify-center gap-1.5 group w-full focus:outline-none hover:text-blue-600 transition-colors">
                             <span>{col.header}</span>
@@ -245,15 +244,13 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white">
+          <tbody className="divide-y divide-slate-50 bg-white">
             {sortedData.length > 0 ? (
                 sortedData.map((item, index) => (
-                <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
+                <tr key={item.id} className="hover:bg-blue-50/30 transition-colors group">
                     {columns.map((col) => {
-                    const defaultTdClass = ['name', 'notes', 'recordTypeLabel'].includes(String(col.key))
-                        ? 'px-6 py-4 text-slate-700 align-middle text-sm min-w-[200px]'
-                        : 'whitespace-nowrap px-6 py-4 text-slate-700 align-middle text-sm text-center';
-                    
+                    // Default Styling refined
+                    const defaultTdClass = 'whitespace-nowrap px-6 py-4 text-slate-600 align-middle text-sm text-center font-medium';
                     const tdClass = col.cellClassName || defaultTdClass;
 
                     return (
@@ -263,12 +260,12 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
                         ) : col.key === 'actions' ? (
                             <div className="flex gap-2 justify-center opacity-80 group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => onEdit(item)} className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors" title="تعديل"><PencilIcon /></button>
-                                <button onClick={() => onDelete(item)} className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors" title="حذف"><TrashIcon /></button>
+                                <button onClick={() => onDelete(item)} className="text-rose-500 hover:text-rose-700 p-2 hover:bg-rose-50 rounded-lg transition-colors" title="حذف"><TrashIcon /></button>
                             </div>
                         ) : col.key === 'serial' ? (
-                            <span className="font-medium text-slate-400 text-xs">{index + 1}</span>
+                            <span className="font-bold text-slate-400 text-xs">{index + 1}</span>
                         ) : col.key === 'status' && item.status ? (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${getStatusClass(item.status)}`}>
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${getStatusClass(item.status)}`}>
                                 {item.status}
                             </span>
                         ) : col.key === 'remaining' ? (
@@ -301,7 +298,7 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
                                 <span className="text-slate-300 text-xs">-</span>
                             )
                         ) : (
-                            <span className="font-medium">{String(item[col.key as keyof T] ?? '')}</span>
+                            <span>{String(item[col.key as keyof T] ?? '')}</span>
                         )}
                         </td>
                     );
@@ -312,7 +309,7 @@ const DataTable = <T extends { id: number; status?: RecordStatus; expiryDate?: s
                 <tr>
                     <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-400 bg-slate-50/50">
                         <div className="flex flex-col items-center justify-center gap-2">
-                             <svg className="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                             <svg className="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                              <p>لا توجد بيانات للعرض</p>
                         </div>
                     </td>

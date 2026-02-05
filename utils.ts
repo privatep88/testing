@@ -6,13 +6,13 @@ export const formatCost = (cost: number) => new Intl.NumberFormat('en-US').forma
 export const getStatusClass = (status: RecordStatus) => {
   switch (status) {
     case RecordStatus.Active:
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
     case RecordStatus.SoonToExpire:
-      return 'bg-amber-50 text-amber-700 border border-amber-200';
+      return 'bg-amber-50 text-amber-700 border border-amber-100';
     case RecordStatus.Expired:
-      return 'bg-rose-50 text-rose-700 border border-rose-200';
+      return 'bg-rose-50 text-rose-700 border border-rose-100';
     default:
-      return 'bg-slate-50 text-slate-700 border border-slate-200';
+      return 'bg-slate-50 text-slate-700 border border-slate-100';
   }
 };
 
@@ -73,5 +73,5 @@ export const getRemainingPeriodClass = (expiryDate: string | undefined): string 
     if (diffDays <= 120) { // 4 months warning
         return 'text-amber-600 font-bold';
     }
-    return 'text-emerald-600 font-medium';
+    return 'text-emerald-600 font-bold';
 };

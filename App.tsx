@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Header from './components/Header';
-import SecondaryHeader from './components/SecondaryHeader'; // Acts as Sidebar
+import SecondaryHeader from './components/SecondaryHeader';
 import LicenseManagement from './components/LicenseManagement';
 import ContractManagement from './components/ContractManagement';
 import SpecialAgenciesManagement from './components/OtherTopics';
@@ -20,7 +20,7 @@ import NotificationBanner from './components/NotificationBanner';
 import TrademarkManagement from './components/TrademarkManagement';
 import Dashboard from './components/Dashboard';
 import CalendarView from './components/CalendarView';
-import { SaveIcon, CheckIcon } from './components/icons/ActionIcons';
+import { SaveIcon } from './components/icons/ActionIcons';
 
 const getOverallStatus = (statuses: (RecordStatus | undefined)[]): RecordStatus => {
     const validStatuses = statuses.filter(Boolean) as RecordStatus[];
@@ -33,23 +33,20 @@ const getOverallStatus = (statuses: (RecordStatus | undefined)[]): RecordStatus 
     return RecordStatus.Active;
 };
 
-// Moved helper outside to avoid dependency cycles and ensure it's available for init logic
 const getCalculatedStatus = (expiryDate: string | undefined): RecordStatus => {
     if (!expiryDate) {
-        return RecordStatus.Active; // Default if no date
+        return RecordStatus.Active;
     }
     const now = new Date();
-    // Use start of day for consistent comparison
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); 
 
     const parts = expiryDate.split('-');
     if (parts.length !== 3) return RecordStatus.Active;
     
-    // Create expiry date at start of day, local time
     const expiry = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
     
     if (isNaN(expiry.getTime())) {
-        return RecordStatus.Active; // Invalid date
+        return RecordStatus.Active; 
     }
 
     if (expiry < today) {
@@ -57,7 +54,7 @@ const getCalculatedStatus = (expiryDate: string | undefined): RecordStatus => {
     }
 
     const fourMonthsFromNow = new Date(today);
-    fourMonthsFromNow.setDate(today.getDate() + 120); // 4 months = 120 days
+    fourMonthsFromNow.setDate(today.getDate() + 120); 
 
     if (expiry <= fourMonthsFromNow) {
         return RecordStatus.SoonToExpire;
@@ -71,7 +68,6 @@ const STORAGE_KEY = 'SAHER_APP_DATA_V1';
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(TABS[0]);
   
-  // Data States
   const [commercialLicenses, setCommercialLicenses] = useState<License[]>([]);
   const [operationalLicenses, setOperationalLicenses] = useState<License[]>([]);
   const [civilDefenseCerts, setCivilDefenseCerts] = useState<License[]>([]);
@@ -83,23 +79,15 @@ const App: React.FC = () => {
   const [trademarkCerts, setTrademarkCerts] = useState<License[]>([]);
   const [archivedRecords, setArchivedRecords] = useState<ArchivedRecord[]>([]);
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Notification State
   const [expiringItems, setExpiringItems] = useState<Array<License | Contract>>([]);
   const [showNotification, setShowNotification] = useState(false);
-
-  // Save Confirmation State
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const isInitialMount = useRef(true); // Ref to track initial load
+  const isInitialMount = useRef(true); 
 
-  // Modal State
   const [modalInfo, setModalInfo] = useState<{ isOpen: boolean; record?: RecordType | ArchivedRecord; type?: RecordDataType }>({ isOpen: false });
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; record?: RecordType | ArchivedRecord; type?: RecordDataType; isPermanent?: boolean }>({ isOpen: false });
 
-
-  // Initial Data Loading Effect (Load from LocalStorage or Fallback to Mocks)
   useEffect(() => {
     const processLicenses = (licenses: License[]): License[] => 
         licenses.map(l => ({ ...l, status: getCalculatedStatus(l.expiryDate) }));
@@ -130,7 +118,6 @@ const App: React.FC = () => {
         }
 
         if (data) {
-             // Load and Recalculate statuses based on current date
              setCommercialLicenses(processLicenses(data.commercialLicenses || []));
              setOperationalLicenses(processLicenses(data.operationalLicenses || []));
              setCivilDefenseCerts(processLicenses(data.civilDefenseCerts || []));
@@ -142,7 +129,6 @@ const App: React.FC = () => {
              setTrademarkCerts(processLicenses(data.trademarkCerts || []));
              setArchivedRecords(data.archivedRecords || []);
         } else {
-             // Fallback to Mocks if no saved data
              setCommercialLicenses(processLicenses(MOCK_COMMERCIAL_LICENSES));
              setOperationalLicenses(processLicenses(MOCK_OPERATIONAL_LICENSES));
              setCivilDefenseCerts(processLicenses(MOCK_CIVIL_DEFENSE_CERTS));
@@ -159,7 +145,6 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
-  // AUTO SAVE EFFECT
   useEffect(() => {
     const dataToSave = {
         commercialLicenses,
@@ -205,7 +190,6 @@ const App: React.FC = () => {
       archivedRecords
   ]);
 
-  // Global Save Handler
   const handleGlobalSave = () => {
       const dataToSave = {
           commercialLicenses,
@@ -295,7 +279,6 @@ const App: React.FC = () => {
       reader.readAsText(file);
   };
 
-  // Notification Logic
   useEffect(() => {
     const allRecords = [
         ...commercialLicenses,
@@ -518,7 +501,6 @@ const App: React.FC = () => {
     handleCloseModal();
   };
   
-  // Filter Logic
   const lowercasedQuery = searchQuery.toLowerCase();
   
   const filteredCommercialLicenses = commercialLicenses.filter(item =>
@@ -586,7 +568,6 @@ const App: React.FC = () => {
     item.notes?.toLowerCase().includes(lowercasedQuery)
   );
 
-  // Calculate Tab Counts
   const tabCounts = useMemo(() => {
     const allRecordsCount = filteredCommercialLicenses.length + 
                     filteredOperationalLicenses.length + 
@@ -762,19 +743,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 text-gray-800 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden">
       
-      {/* Sidebar (Formerly SecondaryHeader) */}
+      {/* Sidebar Navigation */}
       <SecondaryHeader 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
         counts={tabCounts} 
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
           
-          {/* Top Header */}
           <Header 
             searchQuery={searchQuery}
             onSearchChange={(e) => setSearchQuery(e.target.value)}
@@ -782,9 +761,11 @@ const App: React.FC = () => {
             onRestore={handleRestoreBackup}
           />
           
-          <main className="flex-1 overflow-y-auto bg-slate-50 relative custom-scrollbar">
-            <div className="max-w-7xl mx-auto p-6 md:p-8">
-                
+          <main className="flex-1 overflow-y-auto p-8 relative scroll-smooth custom-scrollbar">
+            {/* Background pattern for visual interest */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none fixed"></div>
+
+            <div className="max-w-7xl mx-auto space-y-8 relative z-10">
                 {showNotification && expiringItems.length > 0 && (
                     <NotificationBanner 
                         items={expiringItems}
@@ -792,35 +773,37 @@ const App: React.FC = () => {
                         onDismiss={handleDismissNotification}
                     />
                 )}
-
-                 {/* Tab Title (Breadcrumb style) */}
-                 <div className="mb-6 flex items-center gap-2 text-sm text-slate-500">
-                    <span>الرئيسية</span>
-                    <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    <span className="font-bold text-slate-800">{activeTab.name}</span>
-                 </div>
+                
+                {/* Header Breadcrumb with animation */}
+                <div className="flex items-center gap-3 text-sm text-slate-500 animate-fade-in">
+                    <span className="hover:text-blue-600 transition-colors cursor-pointer">الرئيسية</span>
+                    <svg className="w-4 h-4 rtl:rotate-180 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <span className="font-bold text-slate-800 bg-white px-3 py-1 rounded-full shadow-sm">{activeTab.name}</span>
+                </div>
 
                 {renderContent()}
-
-                {/* Floating Save Button */}
-                <div className="fixed bottom-8 left-8 z-50">
-                    <button
-                        onClick={handleGlobalSave}
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl shadow-blue-600/30 transition-all hover:scale-110 flex items-center justify-center group"
-                        aria-label="حفظ التغييرات"
-                        title="حفظ التغييرات"
-                    >
-                        <SaveIcon />
-                        {saveSuccess && (
-                            <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap animate-fade-in-up">
-                                تم الحفظ!
-                            </span>
-                        )}
-                    </button>
-                </div>
             </div>
-             <Footer />
+
+            <Footer />
           </main>
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="fixed bottom-8 left-8 z-50">
+        <button
+            onClick={handleGlobalSave}
+            className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-4 rounded-2xl shadow-xl shadow-blue-600/30 transition-all hover:scale-110 flex items-center justify-center relative overflow-hidden"
+            aria-label="حفظ التغييرات"
+            title="حفظ التغييرات"
+        >
+            <span className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors"></span>
+            <SaveIcon />
+            {saveSuccess && (
+                <span className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap animate-fade-in-up border border-slate-700">
+                    تم الحفظ!
+                </span>
+            )}
+        </button>
       </div>
 
       <Modal isOpen={modalInfo.isOpen} onClose={handleCloseModal} title={modalInfo.record ? "تعديل السجل" : "إضافة سجل جديد"}>
@@ -841,32 +824,32 @@ const App: React.FC = () => {
         size="sm"
       >
         <div className="text-center p-6">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-6">
-            <svg className="h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-50 mb-6 shadow-inner animate-pulse">
+            <svg className="h-10 w-10 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <h3 className="text-xl font-bold text-slate-800 mb-2">
               {deleteConfirmation.isPermanent ? "هل أنت متأكد من الحذف النهائي؟" : "نقل إلى الأرشيف"}
           </h3>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-slate-500 mb-8 leading-relaxed">
               {deleteConfirmation.isPermanent 
                 ? "سيتم حذف هذا السجل بشكل دائم ولا يمكن استعادته مرة أخرى. هذا الإجراء لا يمكن التراجع عنه."
                 : "سيتم نقل السجل إلى الأرشيف. يمكنك استعادته لاحقاً في أي وقت."
               }
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-4">
             <button
               type="button"
               onClick={() => setDeleteConfirmation({ isOpen: false })}
-              className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-colors"
             >
               إلغاء الأمر
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 shadow-md shadow-red-500/20 transition-all"
+              className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all"
             >
               {deleteConfirmation.isPermanent ? "حذف نهائي" : "نقل للأرشيف"}
             </button>
@@ -875,8 +858,10 @@ const App: React.FC = () => {
       </Modal>
       
       <style>{`
+        /* Global Scrollbar Styling */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
@@ -885,12 +870,24 @@ const App: React.FC = () => {
             background-color: #cbd5e1;
             border-radius: 20px;
         }
-        .animate-fade-in-up {
-            animation: fadeInUp 0.3s ease-out forwards;
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8;
         }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
         @keyframes fadeInUp {
             from { opacity: 0; transform: translate(-50%, 10px); }
             to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
       `}</style>
     </div>

@@ -27,60 +27,62 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onBackup, 
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shadow-sm relative z-20 print:hidden">
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-20 px-8 py-4 flex items-center justify-between border-b border-slate-200/60 print:hidden transition-all duration-300">
         
-        {/* Left Side: Search */}
-        <div className="flex items-center gap-4 flex-1">
-            <div className="relative w-full max-w-md group">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+        {/* Search Bar */}
+        <div className="flex items-center flex-1 max-w-2xl">
+            <div className="relative w-full group">
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors duration-300">
                     <SearchIcon />
                 </div>
                 <input
                     type="text"
-                    placeholder="ابحث عن رخصة، عقد، أو رقم..."
+                    placeholder="ابحث عن رخصة، عقد، رقم، أو ملاحظة..."
                     value={searchQuery}
                     onChange={onSearchChange}
-                    className="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all text-sm"
+                    className="w-full pr-11 pl-4 py-3 bg-slate-100/50 border-none rounded-2xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-300 shadow-inner"
                 />
             </div>
         </div>
 
-        {/* Right Side: Actions */}
-        <div className="flex items-center gap-3">
-             <div className="h-6 w-px bg-slate-200 mx-2"></div>
-
+        {/* Actions Area */}
+        <div className="flex items-center gap-4 mr-6">
              {/* Action Buttons */}
              <div className="flex items-center gap-2">
-                <button
-                    onClick={onBackup}
-                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                    title="نسخ احتياطي للبيانات"
-                >
-                    <BackupIcon />
-                </button>
+                <div className="flex bg-white rounded-xl shadow-sm border border-slate-100 p-1">
+                    <button
+                        onClick={onBackup}
+                        className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all tooltip-trigger relative group"
+                        title="نسخ احتياطي للبيانات"
+                    >
+                        <BackupIcon />
+                    </button>
 
-                <button
-                    onClick={handleRestoreClick}
-                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                    title="استعادة البيانات"
-                >
-                    <RestoreIcon />
-                </button>
-                <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileChange} 
-                    className="hidden" 
-                    accept=".json"
-                />
+                    <button
+                        onClick={handleRestoreClick}
+                        className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        title="استعادة البيانات"
+                    >
+                        <RestoreIcon />
+                    </button>
+                    <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleFileChange} 
+                        className="hidden" 
+                        accept=".json"
+                    />
 
-                <button
-                    onClick={() => window.print()}
-                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                    title="طباعة"
-                >
-                    <PrintIcon />
-                </button>
+                    <div className="w-px bg-slate-200 my-1 mx-1"></div>
+
+                    <button
+                        onClick={() => window.print()}
+                        className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                        title="طباعة"
+                    >
+                        <PrintIcon />
+                    </button>
+                </div>
             </div>
         </div>
     </header>
